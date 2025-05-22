@@ -7,15 +7,15 @@ from peewee import (
     DateTimeField,
     FloatField, IntegerField,
     Model,
-    SqliteDatabase as PeeweeSqliteDatabase,
+    SqliteDatabase as PeeweeSqlite数据库,
     ModelSelect,
     ModelDelete,
     chunked,
     fn
 )
 
-from xmpy.包_交易核心.模块_常数 import 类_交易所,类_周期
-from xmpy.包_交易核心.模块_对象 import 类_K线数据,类_行情数据
+from xmpy.包_交易核心.模块_常数 import 类_交易所, 类_周期
+from xmpy.包_交易核心.模块_对象 import 类_K线数据, 类_行情数据
 from xmpy.包_交易核心.模块_工具 import 获取文件路径
 from xmpy.包_交易核心.模块_基础数据库 import (
     类_基础数据库,
@@ -25,457 +25,569 @@ from xmpy.包_交易核心.模块_基础数据库 import (
     转换时区
 )
 
-path: str = str(获取文件路径("database.db"))
-db: PeeweeSqliteDatabase = PeeweeSqliteDatabase(path)
+数据库路径: str = str(获取文件路径("database.db"))
+数据库: PeeweeSqlite数据库 = PeeweeSqlite数据库(数据库路径)
 
 
-class DbBarData(Model):
+class 类_K线数据表(Model):
     """K线数据表映射对象"""
 
-    id: AutoField = AutoField()
+    标识符: AutoField = AutoField()
 
-    symbol: str = CharField()
-    exchange: str = CharField()
-    datetime: datetime = DateTimeField()
-    interval: str = CharField()
+    代码: str = CharField()
+    交易所: str = CharField()
+    时间戳: datetime = DateTimeField()
+    周期: str = CharField()
 
-    volume: float = FloatField()
-    turnover: float = FloatField()
-    open_interest: float = FloatField()
-    open_price: float = FloatField()
-    high_price: float = FloatField()
-    low_price: float = FloatField()
-    close_price: float = FloatField()
+    成交量: float = FloatField()
+    成交额: float = FloatField()
+    持仓量: float = FloatField()
+    开盘价: float = FloatField()
+    最高价: float = FloatField()
+    最低价: float = FloatField()
+    收盘价: float = FloatField()
 
     class Meta:
-        database: PeeweeSqliteDatabase = db
-        indexes: tuple = ((("symbol", "exchange", "interval", "datetime"), True),)
+        database: PeeweeSqlite数据库 = 数据库
+        indexes: tuple = ((("代码", "交易所", "周期", "时间戳"), True),)
 
 
-class DbTickData(Model):
+class 类_Tick数据表(Model):
     """TICK数据表映射对象"""
 
-    id: AutoField = AutoField()
+    标识符: AutoField = AutoField()
 
-    symbol: str = CharField()
-    exchange: str = CharField()
-    datetime: datetime = DateTimeField()
+    代码: str = CharField()
+    交易所: str = CharField()
+    时间戳: datetime = DateTimeField()
 
-    name: str = CharField()
-    volume: float = FloatField()
-    turnover: float = FloatField()
-    open_interest: float = FloatField()
-    last_price: float = FloatField()
-    last_volume: float = FloatField()
-    limit_up: float = FloatField()
-    limit_down: float = FloatField()
+    名称: str = CharField()
+    成交量: float = FloatField()
+    成交额: float = FloatField()
+    持仓量: float = FloatField()
+    最新价: float = FloatField()
+    最新量: float = FloatField()
+    涨停价: float = FloatField()
+    跌停价: float = FloatField()
 
-    open_price: float = FloatField()
-    high_price: float = FloatField()
-    low_price: float = FloatField()
-    pre_close: float = FloatField()
+    开盘价: float = FloatField()
+    最高价: float = FloatField()
+    最低价: float = FloatField()
+    昨收价: float = FloatField()
 
-    bid_price_1: float = FloatField()
-    bid_price_2: float = FloatField(null=True)
-    bid_price_3: float = FloatField(null=True)
-    bid_price_4: float = FloatField(null=True)
-    bid_price_5: float = FloatField(null=True)
+    买一价: float = FloatField()
+    买二价: float = FloatField(null=True)
+    买三价: float = FloatField(null=True)
+    买四价: float = FloatField(null=True)
+    买五价: float = FloatField(null=True)
 
-    ask_price_1: float = FloatField()
-    ask_price_2: float = FloatField(null=True)
-    ask_price_3: float = FloatField(null=True)
-    ask_price_4: float = FloatField(null=True)
-    ask_price_5: float = FloatField(null=True)
+    卖一价: float = FloatField()
+    卖二价: float = FloatField(null=True)
+    卖三价: float = FloatField(null=True)
+    卖四价: float = FloatField(null=True)
+    卖五价: float = FloatField(null=True)
 
-    bid_volume_1: float = FloatField()
-    bid_volume_2: float = FloatField(null=True)
-    bid_volume_3: float = FloatField(null=True)
-    bid_volume_4: float = FloatField(null=True)
-    bid_volume_5: float = FloatField(null=True)
+    买一量: float = FloatField()
+    买二量: float = FloatField(null=True)
+    买三量: float = FloatField(null=True)
+    买四量: float = FloatField(null=True)
+    买五量: float = FloatField(null=True)
 
-    ask_volume_1: float = FloatField()
-    ask_volume_2: float = FloatField(null=True)
-    ask_volume_3: float = FloatField(null=True)
-    ask_volume_4: float = FloatField(null=True)
-    ask_volume_5: float = FloatField(null=True)
+    卖一量: float = FloatField()
+    卖二量: float = FloatField(null=True)
+    卖三量: float = FloatField(null=True)
+    卖四量: float = FloatField(null=True)
+    卖五量: float = FloatField(null=True)
 
-    localtime: datetime = DateTimeField(null=True)
+    本地时间: datetime = DateTimeField(null=True)
 
     class Meta:
-        database: PeeweeSqliteDatabase = db
-        indexes: tuple = ((("symbol", "exchange", "datetime"), True),)
+        database: PeeweeSqlite数据库 = 数据库
+        indexes: tuple = ((("代码", "交易所", "时间戳"), True),)
 
 
-class DbBarOverview(Model):
+class 类_K线概览表(Model):
     """K线汇总数据表映射对象"""
 
-    id: AutoField = AutoField()
+    标识符: AutoField = AutoField()
 
-    symbol: str = CharField()
-    exchange: str = CharField()
-    interval: str = CharField()
-    count: int = IntegerField()
-    start: datetime = DateTimeField()
-    end: datetime = DateTimeField()
+    代码: str = CharField()
+    交易所: str = CharField()
+    周期: str = CharField()
+    数量: int = IntegerField()
+    起始时间: datetime = DateTimeField()
+    结束时间: datetime = DateTimeField()
 
     class Meta:
-        database: PeeweeSqliteDatabase = db
-        indexes: tuple = ((("symbol", "exchange", "interval"), True),)
+        database: PeeweeSqlite数据库 = 数据库
+        indexes: tuple = ((("代码", "交易所", "周期"), True),)
 
 
-class DbTickOverview(Model):
+class 类_Tick概览表(Model):
     """Tick汇总数据表映射对象"""
 
-    id: AutoField = AutoField()
+    标识符: AutoField = AutoField()
 
-    symbol: str = CharField()
-    exchange: str = CharField()
-    count: int = IntegerField()
-    start: datetime = DateTimeField()
-    end: datetime = DateTimeField()
+    代码: str = CharField()
+    交易所: str = CharField()
+    数量: int = IntegerField()
+    起始时间: datetime = DateTimeField()
+    结束时间: datetime = DateTimeField()
 
     class Meta:
-        database: PeeweeSqliteDatabase = db
-        indexes: tuple = ((("symbol", "exchange"), True),)
+        database: PeeweeSqlite数据库 = 数据库
+        indexes: tuple = ((("代码", "交易所"), True),)
 
-
-class SqliteDatabase(类_基础数据库):
+class 类_SQLite数据库(类_基础数据库):
     """SQLite数据库接口"""
 
     def __init__(self) -> None:
         """"""
-        self.db: PeeweeSqliteDatabase = db
-        self.db.connect()
-        self.db.create_tables([DbBarData, DbTickData, DbBarOverview, DbTickOverview])
+        self.数据库: PeeweeSqlite数据库 = 数据库
+        self.数据库.connect()
+        self.数据库.create_tables([类_K线数据表, 类_Tick数据表, 类_K线概览表, 类_Tick概览表])
 
-    def 保存K线数据(self, bars: List[类_K线数据], stream: bool = False) -> bool:
+    def 保存K线数据(self, K线列表: List[类_K线数据], 流式存储: bool = False) -> bool:
         """保存K线数据"""
-        # 读取主键参数
-        bar: 类_K线数据 = bars[0]
-        symbol: str = bar.symbol
-        exchange: 类_交易所 = bar.exchange
-        interval: 类_周期 = bar.interval
+        首条K线: 类_K线数据 = K线列表[0]
+        代码: str = 首条K线.代码
+        交易所: 类_交易所 = 首条K线.交易所
+        周期: 类_周期 = 首条K线.周期
 
-        # 将BarData数据转换为字典，并调整时区
-        data: list = []
+        数据列表: list = []
+        for 单条K线 in K线列表:
+            单条K线.时间戳 = 转换时区(单条K线.时间戳)
 
-        for bar in bars:
-            bar.datetime = 转换时区(bar.datetime)
+            数据字典: dict = 单条K线.__dict__
+            数据字典["交易所"] = 数据字典["交易所"].value
+            数据字典["周期"] = 数据字典["周期"].value
+            数据字典.pop("网关名称")
+            数据字典.pop("唯一标识")
+            数据字典.pop("时间")
+            数据列表.append(数据字典)
 
-            d: dict = bar.__dict__
-            d["exchange"] = d["exchange"].value
-            d["interval"] = d["interval"].value
-            d.pop("gateway_name")
-            d.pop("vt_symbol")
-            data.append(d)
+        with self.数据库.atomic():
+            for 数据块 in chunked(数据列表, 5):
+                类_K线数据表.insert_many(数据块).on_conflict_replace().execute()
 
-        # 使用upsert操作将数据更新到数据库中
-        with self.db.atomic():
-            for c in chunked(data, 50):
-                DbBarData.insert_many(c).on_conflict_replace().execute()
-
-        # 更新K线汇总数据
-        overview: DbBarOverview = DbBarOverview.get_or_none(
-            DbBarOverview.symbol == symbol,
-            DbBarOverview.exchange == exchange.value,
-            DbBarOverview.interval == interval.value,
+        概览记录: 类_K线概览表 = 类_K线概览表.get_or_none(
+            类_K线概览表.代码 == 代码,
+            类_K线概览表.交易所 == 交易所.value,
+            类_K线概览表.周期 == 周期.value,
         )
 
-        if not overview:
-            overview = DbBarOverview()
-            overview.symbol = symbol
-            overview.exchange = exchange.value
-            overview.interval = interval.value
-            overview.start = bars[0].datetime
-            overview.end = bars[-1].datetime
-            overview.count = len(bars)
-        elif stream:
-            overview.end = bars[-1].datetime
-            overview.count += len(bars)
+        if not 概览记录:
+            概览记录 = 类_K线概览表()
+            概览记录.代码 = 代码
+            概览记录.交易所 = 交易所.value
+            概览记录.周期 = 周期.value
+            概览记录.起始时间 = K线列表[0].时间戳
+            概览记录.结束时间 = K线列表[-1].时间戳
+            概览记录.数量 = len(K线列表)
+        elif 流式存储:
+            概览记录.结束时间 = K线列表[-1].时间戳
+            概览记录.数量 += len(K线列表)
         else:
-            overview.start = min(bars[0].datetime, overview.start)
-            overview.end = max(bars[-1].datetime, overview.end)
+            概览记录.起始时间 = min(K线列表[0].时间戳, 概览记录.起始时间)
+            概览记录.结束时间 = max(K线列表[-1].时间戳, 概览记录.结束时间)
 
-            s: ModelSelect = DbBarData.select().where(
-                (DbBarData.symbol == symbol)
-                & (DbBarData.exchange == exchange.value)
-                & (DbBarData.interval == interval.value)
+            查询语句: ModelSelect = 类_K线数据表.select().where(
+                (类_K线数据表.代码 == 代码)
+                & (类_K线数据表.交易所 == 交易所.value)
+                & (类_K线数据表.周期 == 周期.value)
             )
-            overview.count = s.count()
+            概览记录.数量 = 查询语句.count()
 
-        overview.save()
-
+        概览记录.save()
         return True
 
-    def 保存Tick数据(self, ticks: List[类_行情数据], stream: bool = False) -> bool:
+    def 保存Tick数据(self, Tick列表: List[类_行情数据], 流式存储: bool = False) -> bool:
         """保存TICK数据"""
-        # 读取主键参数
-        tick: 类_行情数据 = ticks[0]
-        symbol: str = tick.symbol
-        exchange: 类_交易所 = tick.exchange
+        首条Tick: 类_行情数据 = Tick列表[0]
+        代码: str = 首条Tick.代码
+        交易所: 类_交易所 = 首条Tick.交易所
 
-        # 将TickData数据转换为字典，并调整时区
-        data: list = []
+        数据列表: list = []
+        for 单条Tick in Tick列表:
+            单条Tick.时间戳 = 转换时区(单条Tick.时间戳)
 
-        for tick in ticks:
-            tick.datetime = 转换时区(tick.datetime)
+            数据字典: dict = 单条Tick.__dict__
+            数据字典["交易所"] = 数据字典["交易所"].value
+            数据字典.pop("网关名称")
+            数据字典.pop("唯一标识")
+            数据列表.append(数据字典)
 
-            d: dict = tick.__dict__
-            d["exchange"] = d["exchange"].value
-            d.pop("gateway_name")
-            d.pop("vt_symbol")
-            data.append(d)
+        with self.数据库.atomic():
+            for 数据块 in chunked(数据列表, 10):
+                类_Tick数据表.insert_many(数据块).on_conflict_replace().execute()
 
-        # 使用upsert操作将数据更新到数据库中
-        with self.db.atomic():
-            for c in chunked(data, 10):
-                DbTickData.insert_many(c).on_conflict_replace().execute()
-
-        # 更新Tick汇总数据
-        overview: DbTickOverview = DbTickOverview.get_or_none(
-            DbTickOverview.symbol == symbol,
-            DbTickOverview.exchange == exchange.value,
+        概览记录: 类_Tick概览表 = 类_Tick概览表.get_or_none(
+            类_Tick概览表.代码 == 代码,
+            类_Tick概览表.交易所 == 交易所.value,
         )
 
-        if not overview:
-            overview: DbTickOverview = DbTickOverview()
-            overview.symbol = symbol
-            overview.exchange = exchange.value
-            overview.start = ticks[0].datetime
-            overview.end = ticks[-1].datetime
-            overview.count = len(ticks)
-        elif stream:
-            overview.end = ticks[-1].datetime
-            overview.count += len(ticks)
+        if not 概览记录:
+            概览记录 = 类_Tick概览表()
+            概览记录.代码 = 代码
+            概览记录.交易所 = 交易所.value
+            概览记录.起始时间 = Tick列表[0].时间戳
+            概览记录.结束时间 = Tick列表[-1].时间戳
+            概览记录.数量 = len(Tick列表)
+        elif 流式存储:
+            概览记录.结束时间 = Tick列表[-1].时间戳
+            概览记录.数量 += len(Tick列表)
         else:
-            overview.start = min(ticks[0].datetime, overview.start)
-            overview.end = max(ticks[-1].datetime, overview.end)
+            概览记录.起始时间 = min(Tick列表[0].时间戳, 概览记录.起始时间)
+            概览记录.结束时间 = max(Tick列表[-1].时间戳, 概览记录.结束时间)
 
-            s: ModelSelect = DbTickData.select().where(
-                (DbTickData.symbol == symbol)
-                & (DbTickData.exchange == exchange.value)
+            查询语句: ModelSelect = 类_Tick数据表.select().where(
+                (类_Tick数据表.代码 == 代码)
+                & (类_Tick数据表.交易所 == 交易所.value)
             )
-            overview.count = s.count()
+            概览记录.数量 = 查询语句.count()
 
-        overview.save()
-
+        概览记录.save()
         return True
 
     def 加载K线数据(
-        self,
-        symbol: str,
-        exchange: 类_交易所,
-        interval: 类_周期,
-        start: datetime,
-        end: datetime
+            self,
+            代码: str,
+            交易所: 类_交易所,
+            周期: 类_周期,
+            开始时间: datetime,
+            结束时间: datetime
     ) -> List[类_K线数据]:
         """读取K线数据"""
-        s: ModelSelect = (
-            DbBarData.select().where(
-                (DbBarData.symbol == symbol)
-                & (DbBarData.exchange == exchange.value)
-                & (DbBarData.interval == interval.value)
-                & (DbBarData.datetime >= start)
-                & (DbBarData.datetime <= end)
-            ).order_by(DbBarData.datetime)
+        查询语句: ModelSelect = (
+            类_K线数据表.select().where(
+                (类_K线数据表.代码 == 代码)
+                & (类_K线数据表.交易所 == 交易所.value)
+                & (类_K线数据表.周期 == 周期.value)
+                & (类_K线数据表.时间戳 >= 开始时间)
+                & (类_K线数据表.时间戳 <= 结束时间)
+            ).order_by(类_K线数据表.时间戳)
         )
 
-        bars: List[类_K线数据] = []
-        for db_bar in s:
-            bar: 类_K线数据 = 类_K线数据(
-                symbol=db_bar.symbol,
-                exchange=类_交易所(db_bar.exchange),
-                datetime=datetime.fromtimestamp(db_bar.datetime.timestamp(), 数据库时区),
-                interval=类_周期(db_bar.interval),
-                volume=db_bar.volume,
-                turnover=db_bar.turnover,
-                open_interest=db_bar.open_interest,
-                open_price=db_bar.open_price,
-                high_price=db_bar.high_price,
-                low_price=db_bar.low_price,
-                close_price=db_bar.close_price,
-                gateway_name="DB"
+        K线列表: List[类_K线数据] = []
+        for 数据库K线 in 查询语句:
+            K线对象 = 类_K线数据(
+                代码=数据库K线.代码,
+                交易所=类_交易所(数据库K线.交易所),
+                时间戳=datetime.fromtimestamp(数据库K线.时间戳.timestamp(), 数据库时区),
+                周期=类_周期(数据库K线.周期),
+                成交量=数据库K线.成交量,
+                成交额=数据库K线.成交额,
+                持仓量=数据库K线.持仓量,
+                开盘价=数据库K线.开盘价,
+                最高价=数据库K线.最高价,
+                最低价=数据库K线.最低价,
+                收盘价=数据库K线.收盘价,
+                网关名称="数据库"
             )
-            bars.append(bar)
-
-        return bars
+            K线列表.append(K线对象)
+        return K线列表
 
     def 加载Tick数据(
-        self,
-        symbol: str,
-        exchange: 类_交易所,
-        start: datetime,
-        end: datetime
+            self,
+            代码: str,
+            交易所: 类_交易所,
+            开始时间: datetime,
+            结束时间: datetime
     ) -> List[类_行情数据]:
         """读取TICK数据"""
-        s: ModelSelect = (
-            DbTickData.select().where(
-                (DbTickData.symbol == symbol)
-                & (DbTickData.exchange == exchange.value)
-                & (DbTickData.datetime >= start)
-                & (DbTickData.datetime <= end)
-            ).order_by(DbTickData.datetime)
+        查询语句: ModelSelect = (
+            类_Tick数据表.select().where(
+                (类_Tick数据表.代码 == 代码)
+                & (类_Tick数据表.交易所 == 交易所.value)
+                # & (类_Tick数据表.交易所 == 交易所)
+                & (类_Tick数据表.时间戳 >= 开始时间)
+                & (类_Tick数据表.时间戳 <= 结束时间)
+            ).order_by(类_Tick数据表.时间戳)
         )
 
-        ticks: List[类_行情数据] = []
-        for db_tick in s:
-            tick: 类_行情数据 = 类_行情数据(
-                symbol=db_tick.symbol,
-                exchange=类_交易所(db_tick.exchange),
-                datetime=datetime.fromtimestamp(db_tick.datetime.timestamp(), 数据库时区),
-                name=db_tick.name,
-                volume=db_tick.volume,
-                turnover=db_tick.turnover,
-                open_interest=db_tick.open_interest,
-                last_price=db_tick.last_price,
-                last_volume=db_tick.last_volume,
-                limit_up=db_tick.limit_up,
-                limit_down=db_tick.limit_down,
-                open_price=db_tick.open_price,
-                high_price=db_tick.high_price,
-                low_price=db_tick.low_price,
-                pre_close=db_tick.pre_close,
-                bid_price_1=db_tick.bid_price_1,
-                bid_price_2=db_tick.bid_price_2,
-                bid_price_3=db_tick.bid_price_3,
-                bid_price_4=db_tick.bid_price_4,
-                bid_price_5=db_tick.bid_price_5,
-                ask_price_1=db_tick.ask_price_1,
-                ask_price_2=db_tick.ask_price_2,
-                ask_price_3=db_tick.ask_price_3,
-                ask_price_4=db_tick.ask_price_4,
-                ask_price_5=db_tick.ask_price_5,
-                bid_volume_1=db_tick.bid_volume_1,
-                bid_volume_2=db_tick.bid_volume_2,
-                bid_volume_3=db_tick.bid_volume_3,
-                bid_volume_4=db_tick.bid_volume_4,
-                bid_volume_5=db_tick.bid_volume_5,
-                ask_volume_1=db_tick.ask_volume_1,
-                ask_volume_2=db_tick.ask_volume_2,
-                ask_volume_3=db_tick.ask_volume_3,
-                ask_volume_4=db_tick.ask_volume_4,
-                ask_volume_5=db_tick.ask_volume_5,
-                localtime=db_tick.localtime,
-                gateway_name="DB"
+        Tick列表: List[类_行情数据] = []
+        for 数据库Tick in 查询语句:
+            Tick对象 = 类_行情数据(
+                代码=数据库Tick.代码,
+                交易所=类_交易所(数据库Tick.交易所),
+                时间戳=datetime.fromtimestamp(数据库Tick.时间戳.timestamp(), 数据库时区),
+                名称=数据库Tick.名称,
+                成交量=数据库Tick.成交量,
+                成交额=数据库Tick.成交额,
+                持仓量=数据库Tick.持仓量,
+                最新价=数据库Tick.最新价,
+                最新量=数据库Tick.最新量,
+                涨停价=数据库Tick.涨停价,
+                跌停价=数据库Tick.跌停价,
+                开盘价=数据库Tick.开盘价,
+                最高价=数据库Tick.最高价,
+                最低价=数据库Tick.最低价,
+                昨收价=数据库Tick.昨收价,
+                买一价=数据库Tick.买一价,
+                买二价=数据库Tick.买二价,
+                买三价=数据库Tick.买三价,
+                买四价=数据库Tick.买四价,
+                买五价=数据库Tick.买五价,
+                卖一价=数据库Tick.卖一价,
+                卖二价=数据库Tick.卖二价,
+                卖三价=数据库Tick.卖三价,
+                卖四价=数据库Tick.卖四价,
+                卖五价=数据库Tick.卖五价,
+                买一量=数据库Tick.买一量,
+                买二量=数据库Tick.买二量,
+                买三量=数据库Tick.买三量,
+                买四量=数据库Tick.买四量,
+                买五量=数据库Tick.买五量,
+                卖一量=数据库Tick.卖一量,
+                卖二量=数据库Tick.卖二量,
+                卖三量=数据库Tick.卖三量,
+                卖四量=数据库Tick.卖四量,
+                卖五量=数据库Tick.卖五量,
+                本地时间=数据库Tick.本地时间,
+                网关名称="数据库"
             )
-            ticks.append(tick)
-
-        return ticks
+            Tick列表.append(Tick对象)
+        return Tick列表
 
     def 删除K线数据(
-        self,
-        symbol: str,
-        exchange: 类_交易所,
-        interval: 类_周期
+            self,
+            代码: str,
+            交易所: 类_交易所,
+            周期: 类_周期,
+            开始时间: datetime,
+            结束时间: datetime
     ) -> int:
         """删除K线数据"""
-        d: ModelDelete = DbBarData.delete().where(
-            (DbBarData.symbol == symbol)
-            & (DbBarData.exchange == exchange.value)
-            & (DbBarData.interval == interval.value)
+        删除操作: ModelDelete = 类_K线数据表.delete().where(
+            (类_K线数据表.代码 == 代码)
+            & (类_K线数据表.交易所 == 交易所.value)
+            & (类_K线数据表.周期 == 周期.value)
+            & (类_K线数据表.时间戳 >= 开始时间)
+            & (类_K线数据表.时间戳 <= 结束时间)
         )
-        count: int = d.execute()
+        删除数量: int = 删除操作.execute()
 
-        # 删除K线汇总数据
-        d2: ModelDelete = DbBarOverview.delete().where(
-            (DbBarOverview.symbol == symbol)
-            & (DbBarOverview.exchange == exchange.value)
-            & (DbBarOverview.interval == interval.value)
+        概览记录 = 类_K线概览表.get_or_none(
+            类_K线概览表.代码 == 代码,
+            类_K线概览表.交易所 == 交易所.value,
+            类_K线概览表.周期 == 周期.value,
         )
-        d2.execute()
 
-        return count
+        查询语句: ModelSelect = (
+            类_K线数据表.select().where(
+                (类_K线数据表.代码 == 代码)
+                & (类_K线数据表.交易所 == 交易所.value)
+                & (类_K线数据表.周期 == 周期.value)
+            ).order_by(类_K线数据表.时间戳)
+        )
+
+        K线列表: List[类_K线数据] = []
+        for 数据库K线 in 查询语句:
+            K线对象 = 类_K线数据(
+                代码=数据库K线.代码,
+                交易所=类_交易所(数据库K线.交易所),
+                时间戳=datetime.fromtimestamp(数据库K线.时间戳.timestamp(), 数据库时区),
+                周期=类_周期(数据库K线.周期),
+                成交量=数据库K线.成交量,
+                成交额=数据库K线.成交额,
+                持仓量=数据库K线.持仓量,
+                开盘价=数据库K线.开盘价,
+                最高价=数据库K线.最高价,
+                最低价=数据库K线.最低价,
+                收盘价=数据库K线.收盘价,
+                网关名称="数据库"
+            )
+            K线列表.append(K线对象)
+
+        try:
+
+            if not 概览记录:
+                概览记录 = 类_K线概览表()
+                概览记录.代码 = 代码
+                概览记录.交易所 = 交易所.value
+                概览记录.周期 = 周期.value
+                概览记录.起始时间 = K线列表[0].时间戳.replace(tzinfo=None)
+                概览记录.结束时间 = K线列表[-1].时间戳.replace(tzinfo=None)
+                概览记录.数量 = len(K线列表)
+            else:
+                if K线列表[0].时间戳.replace(tzinfo=None) > 概览记录.起始时间:
+                    概览记录.起始时间 = K线列表[0].时间戳.replace(tzinfo=None)
+                概览记录.起始时间 = min(K线列表[0].时间戳.replace(tzinfo=None), 概览记录.起始时间)
+                概览记录.结束时间 = max(K线列表[-1].时间戳.replace(tzinfo=None), 概览记录.结束时间)
+                概览记录.数量 = 查询语句.count()
+
+            概览记录.save()
+        except IndexError:
+            # 如果 Tick列表 为空（没有数据），捕获 IndexError 并提示合约代码错误
+            raise ValueError("查询列表为空，请检查'合约代码和交易所'是否输入正确")
+        except Exception as e:
+            # 其他错误正常抛出
+            raise e
+        return 删除数量
 
     def 删除Tick数据(
-        self,
-        symbol: str,
-        exchange: 类_交易所
+            self,
+            代码: str,
+            交易所: 类_交易所,
+            开始时间: datetime,
+            结束时间: datetime
     ) -> int:
-        """删除TICK数据"""
-        d: ModelDelete = DbTickData.delete().where(
-            (DbTickData.symbol == symbol)
-            & (DbTickData.exchange == exchange.value)
+        """删除TICK数据, 注意：和删除K线 <= 不同，tick是 < 结束时间"""
+        删除操作: ModelDelete = 类_Tick数据表.delete().where(
+            (类_Tick数据表.代码 == 代码)
+            & (类_Tick数据表.交易所 == 交易所.value)
+            & (类_Tick数据表.时间戳 >= 开始时间)
+            & (类_Tick数据表.时间戳 < 结束时间)
         )
-        count: int = d.execute()
+        删除数量: int = 删除操作.execute()
 
-        # 删除Tick汇总数据
-        d2: ModelDelete = DbTickOverview.delete().where(
-            (DbTickOverview.symbol == symbol)
-            & (DbTickOverview.exchange == exchange.value)
+        概览记录: 类_Tick概览表 = 类_Tick概览表.get_or_none(
+            类_Tick概览表.代码 == 代码,
+            类_Tick概览表.交易所 == 交易所.value,
         )
-        d2.execute()
 
-        return count
+        查询语句: ModelSelect = (
+            类_Tick数据表.select().where(
+                (类_Tick数据表.代码 == 代码)
+                & (类_Tick数据表.交易所 == 交易所.value)
+            ).order_by(类_Tick数据表.时间戳)
+        )
+
+        Tick列表: List[类_行情数据] = []
+        for 数据库Tick in 查询语句:
+            Tick对象 = 类_行情数据(
+                代码=数据库Tick.代码,
+                交易所=类_交易所(数据库Tick.交易所),
+                时间戳=datetime.fromtimestamp(数据库Tick.时间戳.timestamp(), 数据库时区),
+                名称=数据库Tick.名称,
+                成交量=数据库Tick.成交量,
+                成交额=数据库Tick.成交额,
+                持仓量=数据库Tick.持仓量,
+                最新价=数据库Tick.最新价,
+                最新量=数据库Tick.最新量,
+                涨停价=数据库Tick.涨停价,
+                跌停价=数据库Tick.跌停价,
+                开盘价=数据库Tick.开盘价,
+                最高价=数据库Tick.最高价,
+                最低价=数据库Tick.最低价,
+                昨收价=数据库Tick.昨收价,
+                买一价=数据库Tick.买一价,
+                买二价=数据库Tick.买二价,
+                买三价=数据库Tick.买三价,
+                买四价=数据库Tick.买四价,
+                买五价=数据库Tick.买五价,
+                卖一价=数据库Tick.卖一价,
+                卖二价=数据库Tick.卖二价,
+                卖三价=数据库Tick.卖三价,
+                卖四价=数据库Tick.卖四价,
+                卖五价=数据库Tick.卖五价,
+                买一量=数据库Tick.买一量,
+                买二量=数据库Tick.买二量,
+                买三量=数据库Tick.买三量,
+                买四量=数据库Tick.买四量,
+                买五量=数据库Tick.买五量,
+                卖一量=数据库Tick.卖一量,
+                卖二量=数据库Tick.卖二量,
+                卖三量=数据库Tick.卖三量,
+                卖四量=数据库Tick.卖四量,
+                卖五量=数据库Tick.卖五量,
+                本地时间=数据库Tick.本地时间,
+                网关名称="数据库"
+            )
+            Tick列表.append(Tick对象)
+
+        try:
+            if not 概览记录:
+                概览记录 = 类_Tick概览表()
+                概览记录.代码 = 代码
+                概览记录.交易所 = 交易所.value
+                概览记录.起始时间 = Tick列表[0].时间戳.replace(tzinfo=None,microsecond=0)
+                概览记录.结束时间 = Tick列表[-1].时间戳.replace(tzinfo=None,microsecond=0)
+                概览记录.数量 = len(Tick列表)
+            else:
+                if Tick列表[0].时间戳.replace(tzinfo=None,microsecond=0) > 概览记录.起始时间:
+                    概览记录.起始时间 = Tick列表[0].时间戳.replace(tzinfo=None,microsecond=0)
+                概览记录.起始时间 = min(Tick列表[0].时间戳.replace(tzinfo=None,microsecond=0), 概览记录.起始时间)
+                概览记录.结束时间 = max(Tick列表[-1].时间戳.replace(tzinfo=None,microsecond=0), 概览记录.结束时间)
+                概览记录.数量 = 查询语句.count()
+
+            概览记录.save()
+        except IndexError:
+            # 如果 Tick列表 为空（没有数据），捕获 IndexError 并提示合约代码错误
+            raise ValueError("查询列表为空，请检查'合约代码和交易所'是否输入正确")
+        except Exception as e:
+            # 其他错误正常抛出
+            raise e
+        return 删除数量
 
     def 获取K线概览(self) -> List[类_K线概览]:
         """查询数据库中的K线汇总信息"""
-        # 如果已有K线，但缺失汇总信息，则执行初始化
-        data_count: int = DbBarData.select().count()
-        overview_count: int = DbBarOverview.select().count()
-        if data_count and not overview_count:
-            self.init_bar_overview()
+        数据总量: int = 类_K线数据表.select().count()
+        概览数量: int = 类_K线概览表.select().count()
+        if 数据总量 and not 概览数量:
+            self.初始化K线概览()
 
-        s: ModelSelect = DbBarOverview.select()
-        overviews: List[类_K线概览] = []
-        for overview in s:
-            overview.exchange = 类_交易所(overview.exchange)
-            overview.interval = 类_周期(overview.interval)
-            overviews.append(overview)
-        return overviews
+        查询语句: ModelSelect = 类_K线概览表.select()
+        概览列表: List[类_K线概览] = []
+        for 概览项 in 查询语句:
+            概览项.交易所 = 类_交易所(概览项.交易所)
+            概览项.周期 = 类_周期(概览项.周期)
+            概览列表.append(概览项)
+        return 概览列表
 
     def 获取Tick概览(self) -> List[类_Tick概览]:
         """查询数据库中的Tick汇总信息"""
-        s: ModelSelect = DbTickOverview.select()
-        overviews: list = []
-        for overview in s:
-            overview.exchange = 类_交易所(overview.exchange)
-            overviews.append(overview)
-        return overviews
+        查询语句: ModelSelect = 类_Tick概览表.select()
+        概览列表: list = []
+        for 概览项 in 查询语句:
+            概览项.交易所 = 类_交易所(概览项.交易所)
+            概览列表.append(概览项)
+        return 概览列表
 
-    def init_bar_overview(self) -> None:
+    def 初始化K线概览(self) -> None:
         """初始化数据库中的K线汇总信息"""
-        s: ModelSelect = (
-            DbBarData.select(
-                DbBarData.symbol,
-                DbBarData.exchange,
-                DbBarData.interval,
-                fn.COUNT(DbBarData.id).alias("count")
+        聚合查询 = (
+            类_K线数据表.select(
+                类_K线数据表.代码,
+                类_K线数据表.交易所,
+                类_K线数据表.周期,
+                fn.COUNT(类_K线数据表.标识符).alias("数量")
             ).group_by(
-                DbBarData.symbol,
-                DbBarData.exchange,
-                DbBarData.interval
+                类_K线数据表.代码,
+                类_K线数据表.交易所,
+                类_K线数据表.周期
             )
         )
 
-        for data in s:
-            overview: DbBarOverview = DbBarOverview()
-            overview.symbol = data.symbol
-            overview.exchange = data.exchange
-            overview.interval = data.interval
-            overview.count = data.count
+        for 数据项 in 聚合查询:
+            新概览 = 类_K线概览表()
+            新概览.代码 = 数据项.代码
+            新概览.交易所 = 数据项.交易所
+            新概览.周期 = 数据项.周期
+            新概览.数量 = 数据项.数量
 
-            start_bar: DbBarData = (
-                DbBarData.select()
+            首条K线 = (
+                类_K线数据表.select()
                 .where(
-                    (DbBarData.symbol == data.symbol)
-                    & (DbBarData.exchange == data.exchange)
-                    & (DbBarData.interval == data.interval)
+                    (类_K线数据表.代码 == 数据项.代码)
+                    & (类_K线数据表.交易所 == 数据项.交易所)
+                    & (类_K线数据表.周期 == 数据项.周期)
                 )
-                .order_by(DbBarData.datetime.asc())
+                .order_by(类_K线数据表.时间戳.asc())
                 .first()
             )
-            overview.start = start_bar.datetime
+            新概览.起始时间 = 首条K线.时间戳
 
-            end_bar: DbBarData = (
-                DbBarData.select()
+            末条K线 = (
+                类_K线数据表.select()
                 .where(
-                    (DbBarData.symbol == data.symbol)
-                    & (DbBarData.exchange == data.exchange)
-                    & (DbBarData.interval == data.interval)
+                    (类_K线数据表.代码 == 数据项.代码)
+                    & (类_K线数据表.交易所 == 数据项.交易所)
+                    & (类_K线数据表.周期 == 数据项.周期)
                 )
-                .order_by(DbBarData.datetime.desc())
+                .order_by(类_K线数据表.时间戳.desc())
                 .first()
             )
-            overview.end = end_bar.datetime
+            新概览.结束时间 = 末条K线.时间戳
 
-            overview.save()
+            新概览.save()
