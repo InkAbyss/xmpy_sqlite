@@ -7,7 +7,7 @@ from peewee import (
     DateTimeField,
     FloatField, IntegerField,
     Model,
-    SqliteDatabase as PeeweeSqlite数据库,
+    SqliteDatabase as PeeweeSqliteDatabase,
     ModelSelect,
     ModelDelete,
     chunked,
@@ -26,7 +26,7 @@ from xmpy.包_交易核心.模块_基础数据库 import (
 )
 
 数据库路径: str = str(获取文件路径("database.db"))
-数据库: PeeweeSqlite数据库 = PeeweeSqlite数据库(数据库路径)
+数据库: PeeweeSqliteDatabase = PeeweeSqliteDatabase(数据库路径)
 
 
 class 类_K线数据表(Model):
@@ -48,7 +48,7 @@ class 类_K线数据表(Model):
     收盘价: float = FloatField()
 
     class Meta:
-        database: PeeweeSqlite数据库 = 数据库
+        database: PeeweeSqliteDatabase = 数据库
         indexes: tuple = ((("代码", "交易所", "周期", "时间戳"), True),)
 
 
@@ -102,7 +102,7 @@ class 类_Tick数据表(Model):
     本地时间: datetime = DateTimeField(null=True)
 
     class Meta:
-        database: PeeweeSqlite数据库 = 数据库
+        database: PeeweeSqliteDatabase = 数据库
         indexes: tuple = ((("代码", "交易所", "时间戳"), True),)
 
 
@@ -119,7 +119,7 @@ class 类_K线概览表(Model):
     结束时间: datetime = DateTimeField()
 
     class Meta:
-        database: PeeweeSqlite数据库 = 数据库
+        database: PeeweeSqliteDatabase = 数据库
         indexes: tuple = ((("代码", "交易所", "周期"), True),)
 
 
@@ -135,7 +135,7 @@ class 类_Tick概览表(Model):
     结束时间: datetime = DateTimeField()
 
     class Meta:
-        database: PeeweeSqlite数据库 = 数据库
+        database: PeeweeSqliteDatabase = 数据库
         indexes: tuple = ((("代码", "交易所"), True),)
 
 class 类_SQLite数据库(类_基础数据库):
@@ -143,7 +143,7 @@ class 类_SQLite数据库(类_基础数据库):
 
     def __init__(self) -> None:
         """"""
-        self.数据库: PeeweeSqlite数据库 = 数据库
+        self.数据库: PeeweeSqliteDatabase = 数据库
         self.数据库.connect()
         self.数据库.create_tables([类_K线数据表, 类_Tick数据表, 类_K线概览表, 类_Tick概览表])
 
@@ -163,7 +163,6 @@ class 类_SQLite数据库(类_基础数据库):
             数据字典["周期"] = 数据字典["周期"].value
             数据字典.pop("网关名称")
             数据字典.pop("唯一标识")
-            数据字典.pop("时间")
             数据列表.append(数据字典)
 
         with self.数据库.atomic():
