@@ -23,7 +23,7 @@
 
 import importlib_metadata
 
-from .sqlite_database import SqliteDatabase as Database
+from .sqlite_database import 类_SQLite数据库 as Database
 
 
 try:
