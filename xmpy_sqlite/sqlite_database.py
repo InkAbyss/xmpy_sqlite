@@ -196,7 +196,6 @@ class 类_SQLite数据库(类_基础数据库):
                 & (类_K线数据表.周期 == 周期.value)
             )
             概览记录.数量 = 查询语句.count()
-
         概览记录.save()
         return True
 

@@ -1,4 +1,4 @@
-# 星梦(xmpy)框架的SQLite数据库接口
+# xmpy框架的SQLite数据库接口
 
 ## 说明
 
