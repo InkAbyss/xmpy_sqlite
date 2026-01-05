@@ -115,7 +115,7 @@ class 类_K线概览表(Model):
     交易所: str = CharField()
     周期: str = CharField()
     数量: int = IntegerField()
-    起始时间: datetime = DateTimeField()
+    开始时间: datetime = DateTimeField()
     结束时间: datetime = DateTimeField()
 
     class Meta:
@@ -131,7 +131,7 @@ class 类_Tick概览表(Model):
     代码: str = CharField()
     交易所: str = CharField()
     数量: int = IntegerField()
-    起始时间: datetime = DateTimeField()
+    开始时间: datetime = DateTimeField()
     结束时间: datetime = DateTimeField()
 
     class Meta:
@@ -180,14 +180,14 @@ class 类_SQLite数据库(类_基础数据库):
             概览记录.代码 = 代码
             概览记录.交易所 = 交易所.value
             概览记录.周期 = 周期.value
-            概览记录.起始时间 = K线列表[0].时间戳
+            概览记录.开始时间 = K线列表[0].时间戳
             概览记录.结束时间 = K线列表[-1].时间戳
             概览记录.数量 = len(K线列表)
         elif 流式存储:
             概览记录.结束时间 = K线列表[-1].时间戳
             概览记录.数量 += len(K线列表)
         else:
-            概览记录.起始时间 = min(K线列表[0].时间戳, 概览记录.起始时间)
+            概览记录.开始时间 = min(K线列表[0].时间戳, 概览记录.开始时间)
             概览记录.结束时间 = max(K线列表[-1].时间戳, 概览记录.结束时间)
 
             查询语句: ModelSelect = 类_K线数据表.select().where(
@@ -228,14 +228,14 @@ class 类_SQLite数据库(类_基础数据库):
             概览记录 = 类_Tick概览表()
             概览记录.代码 = 代码
             概览记录.交易所 = 交易所.value
-            概览记录.起始时间 = Tick列表[0].时间戳
+            概览记录.开始时间 = Tick列表[0].时间戳
             概览记录.结束时间 = Tick列表[-1].时间戳
             概览记录.数量 = len(Tick列表)
         elif 流式存储:
             概览记录.结束时间 = Tick列表[-1].时间戳
             概览记录.数量 += len(Tick列表)
         else:
-            概览记录.起始时间 = min(Tick列表[0].时间戳, 概览记录.起始时间)
+            概览记录.开始时间 = min(Tick列表[0].时间戳, 概览记录.开始时间)
             概览记录.结束时间 = max(Tick列表[-1].时间戳, 概览记录.结束时间)
 
             查询语句: ModelSelect = 类_Tick数据表.select().where(
@@ -404,13 +404,13 @@ class 类_SQLite数据库(类_基础数据库):
                 概览记录.代码 = 代码
                 概览记录.交易所 = 交易所.value
                 概览记录.周期 = 周期.value
-                概览记录.起始时间 = K线列表[0].时间戳.replace(tzinfo=None)
+                概览记录.开始时间 = K线列表[0].时间戳.replace(tzinfo=None)
                 概览记录.结束时间 = K线列表[-1].时间戳.replace(tzinfo=None)
                 概览记录.数量 = len(K线列表)
             else:
-                if K线列表[0].时间戳.replace(tzinfo=None) > 概览记录.起始时间:
-                    概览记录.起始时间 = K线列表[0].时间戳.replace(tzinfo=None)
-                概览记录.起始时间 = min(K线列表[0].时间戳.replace(tzinfo=None), 概览记录.起始时间)
+                if K线列表[0].时间戳.replace(tzinfo=None) > 概览记录.开始时间:
+                    概览记录.开始时间 = K线列表[0].时间戳.replace(tzinfo=None)
+                概览记录.开始时间 = min(K线列表[0].时间戳.replace(tzinfo=None), 概览记录.开始时间)
                 概览记录.结束时间 = max(K线列表[-1].时间戳.replace(tzinfo=None), 概览记录.结束时间)
                 概览记录.数量 = 查询语句.count()
 
@@ -499,13 +499,13 @@ class 类_SQLite数据库(类_基础数据库):
                 概览记录 = 类_Tick概览表()
                 概览记录.代码 = 代码
                 概览记录.交易所 = 交易所.value
-                概览记录.起始时间 = Tick列表[0].时间戳.replace(tzinfo=None,microsecond=0)
+                概览记录.开始时间 = Tick列表[0].时间戳.replace(tzinfo=None,microsecond=0)
                 概览记录.结束时间 = Tick列表[-1].时间戳.replace(tzinfo=None,microsecond=0)
                 概览记录.数量 = len(Tick列表)
             else:
-                if Tick列表[0].时间戳.replace(tzinfo=None,microsecond=0) > 概览记录.起始时间:
-                    概览记录.起始时间 = Tick列表[0].时间戳.replace(tzinfo=None,microsecond=0)
-                概览记录.起始时间 = min(Tick列表[0].时间戳.replace(tzinfo=None,microsecond=0), 概览记录.起始时间)
+                if Tick列表[0].时间戳.replace(tzinfo=None,microsecond=0) > 概览记录.开始时间:
+                    概览记录.开始时间 = Tick列表[0].时间戳.replace(tzinfo=None,microsecond=0)
+                概览记录.开始时间 = min(Tick列表[0].时间戳.replace(tzinfo=None,microsecond=0), 概览记录.开始时间)
                 概览记录.结束时间 = max(Tick列表[-1].时间戳.replace(tzinfo=None,microsecond=0), 概览记录.结束时间)
                 概览记录.数量 = 查询语句.count()
 
@@ -574,7 +574,7 @@ class 类_SQLite数据库(类_基础数据库):
                 .order_by(类_K线数据表.时间戳.asc())
                 .first()
             )
-            新概览.起始时间 = 首条K线.时间戳
+            新概览.开始时间 = 首条K线.时间戳
 
             末条K线 = (
                 类_K线数据表.select()
