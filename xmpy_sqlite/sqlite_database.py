@@ -111,7 +111,7 @@ class 类_Tick数据表(Model):
 
     class Meta:
         database: PeeweeSqliteDatabase = 数据库
-        indexes: tuple = ((("代码", "交易所", "时间戳"), True),)
+        indexes: tuple = ((("代码", "交易所", "时间戳"), False),)
 
 
 class 类_K线概览表(Model):
@@ -225,7 +225,8 @@ class 类_SQLite数据库(类_基础数据库):
 
         with self.数据库.atomic():
             for 数据块 in chunked(数据列表, 500):
-                类_Tick数据表.insert_many(数据块).on_conflict_replace().execute()
+                # 类_Tick数据表.insert_many(数据块).on_conflict_replace().execute()
+                类_Tick数据表.insert_many(数据块).execute()
 
         概览记录: 类_Tick概览表 = 类_Tick概览表.get_or_none(
             类_Tick概览表.代码 == 代码,
